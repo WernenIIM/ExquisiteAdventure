@@ -1465,7 +1465,11 @@ MonoBehaviour:
   - tournevoltant
   - griffant
   - tapotant
-  pPastVerb: []
+  pPastVerb:
+  - "caress\xE9"
+  - "souffl\xE9 sur"
+  - "d\xE9gomm\xE9"
+  - "hurl\xE9 sur"
   bodypart:
   - son pectoral droit
   - sa queue

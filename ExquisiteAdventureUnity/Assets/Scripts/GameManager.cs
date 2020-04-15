@@ -37,6 +37,7 @@ public class GameManager : MonoBehaviour
     public string withCourageSentence;
     public string efficacitySentence;
 
+    private List<GameObject> textBoxList = new List<GameObject>();
     private int index = 0;
     private int boxIndex = 0;
 
@@ -139,6 +140,41 @@ public class GameManager : MonoBehaviour
                     index++;
                 }
                 break;
+            case WORDTYPE.INFVERB:
+                foreach (Transform buttonGO in choicesPanel.transform)
+                {
+                    buttonGO.gameObject.GetComponentInChildren<Text>().text = infVerb[index];
+                    index++;
+                }
+                break;
+            case WORDTYPE.P_PRESENTVERB:
+                foreach (Transform buttonGO in choicesPanel.transform)
+                {
+                    buttonGO.gameObject.GetComponentInChildren<Text>().text = pPresentVerb[index];
+                    index++;
+                }
+                break;
+            case WORDTYPE.BODYPART:
+                foreach (Transform buttonGO in choicesPanel.transform)
+                {
+                    buttonGO.gameObject.GetComponentInChildren<Text>().text = bodypart[index];
+                    index++;
+                }
+                break;
+            case WORDTYPE.ADJECTIVE:
+                foreach (Transform buttonGO in choicesPanel.transform)
+                {
+                    buttonGO.gameObject.GetComponentInChildren<Text>().text = adjective[index];
+                    index++;
+                }
+                break;
+            case WORDTYPE.P_PASTVERB:
+                foreach (Transform buttonGO in choicesPanel.transform)
+                {
+                    buttonGO.gameObject.GetComponentInChildren<Text>().text = pPastVerb[index];
+                    index++;
+                }
+                break;
         }
     }
 
@@ -173,7 +209,7 @@ public class GameManager : MonoBehaviour
                 {
                     currentSentence.Add(location[choiceIndex]);
                     chosenWord = location[choiceIndex];
-                    currentWordType = WORDTYPE.PASTVERB;
+                    currentWordType = WORDTYPE.INFVERB;
                     DisableChoiceButtons();
                     nextButton.SetActive(true);
                 }
@@ -188,23 +224,28 @@ public class GameManager : MonoBehaviour
             case STORYPART.PART_3:
                 if (currentWordType == WORDTYPE.INFVERB)
                 {
-                    currentSentence.Add(subject[choiceIndex]);
+                    currentSentence.Add(infVerb[choiceIndex]);
+                    chosenWord = infVerb[choiceIndex];
                     currentWordType = WORDTYPE.P_PRESENTVERB;
                 }
                 else if (currentWordType == WORDTYPE.P_PRESENTVERB)
                 {
-                    currentSentence.Add(pastVerb[choiceIndex]);
+                    currentSentence.Add(pPresentVerb[choiceIndex]);
+                    chosenWord = pPresentVerb[choiceIndex];
                     currentWordType = WORDTYPE.BODYPART;
                 }
                 else if (currentWordType == WORDTYPE.BODYPART)
                 {
-                    currentSentence.Add(complement[choiceIndex]);
+                    currentSentence.Add(bodypart[choiceIndex]);
+                    chosenWord = bodypart[choiceIndex];
                     currentWordType = WORDTYPE.ADJECTIVE;
                 }
                 else if (currentWordType == WORDTYPE.ADJECTIVE)
                 {
-                    currentSentence.Add(location[choiceIndex]);
+                    currentSentence.Add(adjective[choiceIndex]);
+                    chosenWord = adjective[choiceIndex];
                     currentWordType = WORDTYPE.P_PASTVERB;
+                    DisableChoiceButtons();
                     nextButton.SetActive(true);
                 }
 
@@ -216,6 +257,9 @@ public class GameManager : MonoBehaviour
         UpdateButtonText();
     }
 
+    /**
+     * Fonction lancée par le bouton NextButton, et permet de passer à l'étape suivante de l'histoire
+     */
     public void NextStep()
     {
         switch(storyPart)
@@ -237,6 +281,10 @@ public class GameManager : MonoBehaviour
         nextButton.SetActive(false);
         DisplayNewStoryPartUI(storyPart);
     }
+
+    /**
+     * Affiche pour une nouvelle étape de l'histoire, les cases vides de mots à remplir, et place les mots déjà préfaits
+     */
     private void DisplayNewStoryPartUI(STORYPART _storyPart)
     {
         DisplaySlots(_storyPart);
@@ -268,76 +316,78 @@ public class GameManager : MonoBehaviour
 
     private void DisplaySlots(STORYPART _storyPart)
     {
-        ClearText();
-
+        textBoxList.Clear();
+        while(sentencePanel.transform.childCount != 0)
+            ClearSentencePanel();
+        GameObject instantiatedObject;
         switch (_storyPart)
         {
             case STORYPART.PART_0:
-                Instantiate(premadeSentencePrefab, sentencePanel.transform);
+                instantiatedObject = Instantiate(premadeSentencePrefab, sentencePanel.transform);
+                //textBoxList.Add(instantiatedObject);
                 break;
             case STORYPART.PART_1:
-                for(int i = 0; i < 4; i++)
+                for (int i = 0; i < 4; i++)
                 {
-                    Instantiate(wordPrefab, sentencePanel.transform);
+                    instantiatedObject = Instantiate(wordPrefab, sentencePanel.transform);
+                    textBoxList.Add(instantiatedObject);
                 }
                 break;
             case STORYPART.PART_2:
-                Instantiate(premadeSentencePrefab, sentencePanel.transform);
+                instantiatedObject = Instantiate(premadeSentencePrefab, sentencePanel.transform);
+                //textBoxList.Add(instantiatedObject);
                 break;
             case STORYPART.PART_3:
-                Instantiate(wordPrefab, sentencePanel.transform);
+                instantiatedObject = Instantiate(wordPrefab, sentencePanel.transform);
+                textBoxList.Add(instantiatedObject);
                 for (int i = 0; i < 2; i++)
                 {
-                    Instantiate(premadeSentencePrefab, sentencePanel.transform);
+                    instantiatedObject = Instantiate(premadeSentencePrefab, sentencePanel.transform);
+                    //textBoxList.Add(instantiatedObject);
                 }
                 for (int i = 0; i < 3; i++)
                 {
-                    Instantiate(wordPrefab, sentencePanel.transform);
+                    instantiatedObject = Instantiate(wordPrefab, sentencePanel.transform);
+                    textBoxList.Add(instantiatedObject);
                 }
                 break;
         }
     }
 
-    private List<GameObject> GetTextBoxList()
-    {
-        List<GameObject> textBoxList = new List<GameObject>();
-        foreach(Transform textBox in sentencePanel.transform)
-        {
-            textBoxList.Add(textBox.gameObject);
-        }
-        return textBoxList;
-    }
 
     private void FillPremadeSentence(STORYPART _storyPart)
     {
         switch (_storyPart)
         {
             case STORYPART.PART_0:
-                GetTextBoxList()[0].GetComponent<Text>().text = beginSentence;
+                //textBoxList[0].GetComponent<Text>().text = beginSentence;
+                sentencePanel.GetComponentInChildren<Text>().text = beginSentence;
                 break;
             case STORYPART.PART_1:
                 break;
             case STORYPART.PART_2:
-                if(GetTextBoxList()[0] != null)
-                    GetTextBoxList()[0].GetComponent<Text>().text = thenSentence;
+                //textBoxList[0].GetComponent<Text>().text = thenSentence;
+                sentencePanel.GetComponentInChildren<Text>().text = thenSentence;
                 break;
             case STORYPART.PART_3:
-                GetTextBoxList()[1].GetComponent<Text>().text = subjectChoosed;
-                GetTextBoxList()[2].GetComponent<Text>().text = "en";
+                //textBoxList[1].GetComponent<Text>().text = subjectChoosed;
+                //textBoxList[2].GetComponent<Text>().text = "en";
+                sentencePanel.GetComponentsInChildren<Text>()[1].text = subjectChoosed;
+                sentencePanel.GetComponentsInChildren<Text>()[2].text = "en";
                 break;
         }
     }
 
     private void FillWithNewWord(string _chosenWord, int _textBoxIndex)
     {
-        GetTextBoxList()[_textBoxIndex].GetComponentInChildren<Text>().text = _chosenWord;
+        textBoxList[_textBoxIndex].GetComponentInChildren<Text>().text = _chosenWord;
     }
 
-    private void ClearText()
+    private void ClearSentencePanel()
     {
         foreach (Transform child in sentencePanel.transform)
         {
-            Destroy(child.gameObject);
+            DestroyImmediate(child.gameObject);
         }
     }
     

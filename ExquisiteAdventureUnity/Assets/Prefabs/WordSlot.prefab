@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 1183876490310882721}
   - component: {fileID: 6028195029389946897}
   - component: {fileID: 4380137491074941554}
-  - component: {fileID: 2507599633114067768}
   m_Layer: 5
   m_Name: WordSlot
   m_TagString: Untagged
@@ -75,18 +74,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &2507599633114067768
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2583340788945996277}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d3acf8a5597395a44919bcc3e533c373, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &5100124461208037468
 GameObject:
   m_ObjectHideFlags: 0
