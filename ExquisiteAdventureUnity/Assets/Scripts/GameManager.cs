@@ -9,7 +9,8 @@ public class GameManager : MonoBehaviour
     public GameObject sentencePanel;
     public GameObject choicesPanel;
     public GameObject wordPrefab;
-    public GameObject premadeSentencePrefab; 
+    public GameObject premadeSentencePrefab;
+    public GameObject nextButton;
     
     [Header("Words lists")]
     public List<string> originalSentence;
@@ -24,6 +25,7 @@ public class GameManager : MonoBehaviour
     public List<string> bodypart;
     public List<string> adjective;
 
+    private string chosenWord;
     private string subjectChoosed;
     private string complementChoosed;
     private string infVerbChoosed;
@@ -34,6 +36,9 @@ public class GameManager : MonoBehaviour
     public string thenSentence;
     public string withCourageSentence;
     public string efficacitySentence;
+
+    private int index = 0;
+    private int boxIndex = 0;
 
     private enum CHOICE
     {
@@ -53,7 +58,6 @@ public class GameManager : MonoBehaviour
         PART_3
     }
     private STORYPART storyPart;
-    private int storyPartIndex = 0;
 
     private enum WORDTYPE
     {
@@ -93,19 +97,49 @@ public class GameManager : MonoBehaviour
         choice = CHOICE.DEFAULT;
         storyPart = STORYPART.PART_0;
 
-        LaunchStoryPart(storyPart);
+        DisplayNewStoryPartUI(storyPart);
     }
 
     // Update is called once per frame
     void Update()
     {
 
-        
     }
 
-    private void Timeline()
+    private void UpdateButtonText()
     {
-
+        index = 0;
+        switch (currentWordType)
+        {
+            case WORDTYPE.SUBJECT:
+                foreach(Transform buttonGO in choicesPanel.transform)
+                {
+                    buttonGO.gameObject.GetComponentInChildren<Text>().text = subject[index];
+                    index++;
+                }
+                break;
+            case WORDTYPE.PASTVERB:
+                foreach (Transform buttonGO in choicesPanel.transform)
+                {
+                    buttonGO.gameObject.GetComponentInChildren<Text>().text = pastVerb[index];
+                    index++;
+                }
+                break;
+            case WORDTYPE.COMPLEMENT:
+                foreach (Transform buttonGO in choicesPanel.transform)
+                {
+                    buttonGO.gameObject.GetComponentInChildren<Text>().text = complement[index];
+                    index++;
+                }
+                break;
+            case WORDTYPE.LOCATION:
+                foreach (Transform buttonGO in choicesPanel.transform)
+                {
+                    buttonGO.gameObject.GetComponentInChildren<Text>().text = location[index];
+                    index++;
+                }
+                break;
+        }
     }
 
     public void ChooseWord(int choiceIndex)
@@ -114,31 +148,43 @@ public class GameManager : MonoBehaviour
         {
             case STORYPART.PART_0:
                 break;
+            
             case STORYPART.PART_1:
                 if (currentWordType == WORDTYPE.SUBJECT)
                 {
                     currentSentence.Add(subject[choiceIndex]);
+                    subjectChoosed = subject[choiceIndex];
+                    chosenWord = subject[choiceIndex];
                     currentWordType = WORDTYPE.PASTVERB;
                 }
                 else if (currentWordType == WORDTYPE.PASTVERB)
                 {
                     currentSentence.Add(pastVerb[choiceIndex]);
+                    chosenWord = pastVerb[choiceIndex];
                     currentWordType = WORDTYPE.COMPLEMENT;
                 }
                 else if (currentWordType == WORDTYPE.COMPLEMENT)
                 {
                     currentSentence.Add(complement[choiceIndex]);
+                    chosenWord = complement[choiceIndex];
                     currentWordType = WORDTYPE.LOCATION;
                 }
                 else if (currentWordType == WORDTYPE.LOCATION)
                 {
                     currentSentence.Add(location[choiceIndex]);
+                    chosenWord = location[choiceIndex];
                     currentWordType = WORDTYPE.PASTVERB;
-                    storyPart = STORYPART.PART_2;
+                    DisableChoiceButtons();
+                    nextButton.SetActive(true);
                 }
+
+                FillWithNewWord(chosenWord, boxIndex);
+                boxIndex++;
                 break;
+            
             case STORYPART.PART_2:
                 break;
+            
             case STORYPART.PART_3:
                 if (currentWordType == WORDTYPE.INFVERB)
                 {
@@ -159,28 +205,57 @@ public class GameManager : MonoBehaviour
                 {
                     currentSentence.Add(location[choiceIndex]);
                     currentWordType = WORDTYPE.P_PASTVERB;
-                    storyPart = STORYPART.PART_2;
+                    nextButton.SetActive(true);
                 }
+
+                FillWithNewWord(chosenWord, boxIndex);
+                boxIndex++;
                 break;
         }
+
+        UpdateButtonText();
     }
 
-    private void LaunchStoryPart(STORYPART _storyPart)
+    public void NextStep()
+    {
+        switch(storyPart)
+        {
+            case STORYPART.PART_0:
+                storyPart = STORYPART.PART_1;
+                break;
+            case STORYPART.PART_1:
+                storyPart = STORYPART.PART_2;
+                break;
+            case STORYPART.PART_2:
+                storyPart = STORYPART.PART_3;
+                break;
+            case STORYPART.PART_3:
+                Debug.Log("Plus de storypart à afficher");
+                break;
+        }
+
+        nextButton.SetActive(false);
+        DisplayNewStoryPartUI(storyPart);
+    }
+    private void DisplayNewStoryPartUI(STORYPART _storyPart)
     {
         DisplaySlots(_storyPart);
         FillPremadeSentence(_storyPart);
+        boxIndex = 0;
 
         //Active ou desactive les boutons de choix
         switch (_storyPart)
         {
             case STORYPART.PART_0:
                 DisableChoiceButtons();
+                nextButton.SetActive(true);
                 break;
             case STORYPART.PART_1:
                 EnableChoiceButtons();
                 break;
             case STORYPART.PART_2:
                 DisableChoiceButtons();
+                nextButton.SetActive(true);
                 break;
             case STORYPART.PART_3:
                 EnableChoiceButtons();
@@ -188,7 +263,7 @@ public class GameManager : MonoBehaviour
 
         }
 
-        //ShowText(currentSentence);
+        UpdateButtonText();
     }
 
     private void DisplaySlots(STORYPART _storyPart)
@@ -223,39 +298,39 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private List<GameObject> GetTextBoxList()
+    {
+        List<GameObject> textBoxList = new List<GameObject>();
+        foreach(Transform textBox in sentencePanel.transform)
+        {
+            textBoxList.Add(textBox.gameObject);
+        }
+        return textBoxList;
+    }
+
     private void FillPremadeSentence(STORYPART _storyPart)
     {
         switch (_storyPart)
         {
             case STORYPART.PART_0:
-                
+                GetTextBoxList()[0].GetComponent<Text>().text = beginSentence;
                 break;
             case STORYPART.PART_1:
                 break;
             case STORYPART.PART_2:
+                if(GetTextBoxList()[0] != null)
+                    GetTextBoxList()[0].GetComponent<Text>().text = thenSentence;
                 break;
             case STORYPART.PART_3:
+                GetTextBoxList()[1].GetComponent<Text>().text = subjectChoosed;
+                GetTextBoxList()[2].GetComponent<Text>().text = "en";
                 break;
         }
     }
 
-    private void ShowText(List<string> sentenceToShow)
+    private void FillWithNewWord(string _chosenWord, int _textBoxIndex)
     {
-        ClearText();
-
-        if (sentenceToShow.Count > 0)
-        {
-            foreach (string word in sentenceToShow)
-            {
-                
-            }
-        }
-        else
-        {
-            Debug.Log("Pas de mots à afficher");
-        }
-
-        sentenceToShow.Clear();
+        GetTextBoxList()[_textBoxIndex].GetComponentInChildren<Text>().text = _chosenWord;
     }
 
     private void ClearText()
