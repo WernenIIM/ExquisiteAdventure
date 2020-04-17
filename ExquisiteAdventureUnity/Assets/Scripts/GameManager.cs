@@ -120,19 +120,18 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        WriteANewStory();
+        GenerateNewStory();
         resultPanel.SetActive(false);
 
         storyPart = STORYPART.PART_0;
 
-        NewStory(storyPart);
+        DisplayNewStoryPartUI(storyPart);
     }
 
     /**
      * Affiche le bon texte dans les word boutons en fonction de la catégorie de mot à choisir
-     * Update Birthday - Leo the twoface
      */
-    private void UpdateBirthday()
+    private void UpdateButtonText()
     {
         index = 0;
         switch (currentWordType)
@@ -212,9 +211,8 @@ public class GameManager : MonoBehaviour
 
     /**
      * Appelée lorsqu'on clique sur un mot à choisir
-     * We Choose - Her
      */
-    public void WeChoose(int choiceIndex)
+    public void ChooseWord(int choiceIndex)
     {
         switch (storyPart)
         {
@@ -247,12 +245,12 @@ public class GameManager : MonoBehaviour
                     currentSentence.Add(location[choiceIndex]);
                     chosenWord = location[choiceIndex];
                     currentWordType = WORDTYPE.INFVERB;
-                    Disabled();
+                    DisableChoiceButtons();
                     nextButton.SetActive(true);
                 }
 
                 hero1WordPlayerList.Add(chosenWord);
-                FillTheCrown(chosenWord, boxIndex);
+                FillWithNewWord(chosenWord, boxIndex);
                 boxIndex++;
                 break;
             
@@ -286,12 +284,12 @@ public class GameManager : MonoBehaviour
                     adjectiveChoosed = adjective[choiceIndex];
                     chosenWord = adjective[choiceIndex];
                     currentWordType = WORDTYPE.P_PASTVERB;
-                    Disabled();
+                    DisableChoiceButtons();
                     nextButton.SetActive(true);
                 }
 
                 hero2WordPlayerList.Add(chosenWord);
-                FillTheCrown(chosenWord, boxIndex);
+                FillWithNewWord(chosenWord, boxIndex);
                 boxIndex++;
                 break;
             case STORYPART.PART_4:
@@ -308,12 +306,12 @@ public class GameManager : MonoBehaviour
                     currentSentence.Add(pPresentVerb[choiceIndex]);
                     complement2Choosed = complement2[choiceIndex];
                     chosenWord = complement2[choiceIndex];
-                    Disabled();
+                    DisableChoiceButtons();
                     nextButton.SetActive(true);
                 }
 
                 hero3WordPlayerList.Add(chosenWord);
-                FillTheCrown(chosenWord, boxIndex);
+                FillWithNewWord(chosenWord, boxIndex);
                 boxIndex++;
                 break;
             case STORYPART.PART_6:
@@ -330,12 +328,11 @@ public class GameManager : MonoBehaviour
                 break;
         }
 
-        UpdateBirthday();
+        UpdateButtonText();
     }
 
     /**
      * Fonction lancée par le bouton NextButton, et permet de passer à l'étape suivante de l'histoire
-     * Next Step - Sian
      */
     public void NextStep()
     {
@@ -379,7 +376,7 @@ public class GameManager : MonoBehaviour
                 {
                     resultPanel.SetActive(true);
                     sentencePanel.SetActive(false);
-                    ShowMustGoOn();
+                    ShowResults();
                 }
                 else
                 {
@@ -397,80 +394,76 @@ public class GameManager : MonoBehaviour
         }
 
         nextButton.SetActive(false);
-        NewStory(storyPart);
+        DisplayNewStoryPartUI(storyPart);
     }
 
     /**
      * Affiche pour une nouvelle étape de l'histoire, les cases vides de mots à remplir, et place les mots déjà préfaits
-     * New Story - Sixty Seconds
      */
-    private void NewStory(STORYPART _storyPart)
+    private void DisplayNewStoryPartUI(STORYPART _storyPart)
     {
-        FastDisplay(_storyPart);
-        FillMeIn(_storyPart);
+        DisplaySlots(_storyPart);
+        FillPremadeSentence(_storyPart);
         boxIndex = 0;
 
         //Active ou desactive les boutons de choix
         switch (_storyPart)
         {
             case STORYPART.PART_0:
-                Disabled();
+                DisableChoiceButtons();
                 nextButton.SetActive(true);
                 break;
             case STORYPART.PART_1:
-                Enabler();
+                EnableChoiceButtons();
                 break;
             case STORYPART.PART_2:
-                Disabled();
+                DisableChoiceButtons();
                 nextButton.SetActive(true);
                 break;
             case STORYPART.PART_3:
-                Enabler();
+                EnableChoiceButtons();
                 break;
             case STORYPART.PART_4:
-                Disabled();
+                DisableChoiceButtons();
                 nextButton.SetActive(true);
                 break;
             case STORYPART.PART_5:
-                Enabler();
+                EnableChoiceButtons();
                 break;
             case STORYPART.PART_6:
-                Disabled();
+                DisableChoiceButtons();
                 nextButton.SetActive(true);
                 break;
             case STORYPART.PART_7:
-                Disabled();
+                DisableChoiceButtons();
                 nextButton.SetActive(true);
                 break;
             case STORYPART.PART_8:
-                Disabled();
+                DisableChoiceButtons();
                 nextButton.SetActive(true);
                 break;
             case STORYPART.PART_9:
-                Disabled();
+                DisableChoiceButtons();
                 nextButton.SetActive(true);
                 break;
             case STORYPART.PART_10:
-                Disabled();
+                DisableChoiceButtons();
                 nextButton.SetActive(true);
                 break;
             case STORYPART.PART_11:
-                Disabled();
+                DisableChoiceButtons();
                 nextButton.SetActive(true);
                 break;
         }
 
-        UpdateBirthday();
+        UpdateButtonText();
     }
 
-    /**
-     * Fast Display - Mwuana
-     */
-    private void FastDisplay(STORYPART _storyPart)
+    private void DisplaySlots(STORYPART _storyPart)
     {
         textBoxList.Clear();
         while(sentencePanel.transform.childCount != 0)
-            ClearSkies();
+            ClearSentencePanel();
         GameObject instantiatedObject;
         switch (_storyPart)
         {
@@ -551,10 +544,8 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    /**
-     * Fill Me In - Craig David
-     */
-    private void FillMeIn(STORYPART _storyPart)
+
+    private void FillPremadeSentence(STORYPART _storyPart)
     {
         switch (_storyPart)
         {
@@ -610,18 +601,12 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    /**
-     * Fill The Crown - Poppy
-     */
-    private void FillTheCrown(string _chosenWord, int _textBoxIndex)
+    private void FillWithNewWord(string _chosenWord, int _textBoxIndex)
     {
         textBoxList[_textBoxIndex].GetComponentInChildren<Text>().text = _chosenWord;
     }
 
-    /**
-     * Clear Skies - Dhyana Thomas
-     */
-    private void ClearSkies()
+    private void ClearSentencePanel()
     {
         foreach (Transform child in sentencePanel.transform)
         {
@@ -629,10 +614,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    /**
-     * Disabled - Mosquit
-     */
-    private void Disabled()
+    private void DisableChoiceButtons()
     {
         foreach(Transform button in choicesPanel.transform)
         {
@@ -640,10 +622,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    /**
-     * Enabler - Otherkin
-     */
-    private void Enabler()
+    private void EnableChoiceButtons()
     {
         foreach (Transform button in choicesPanel.transform)
         {
@@ -651,10 +630,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    /**
-     * Write a New Story - Bloom & the Bliss
-     */
-    private void WriteANewStory()
+    private void GenerateNewStory()
     {
         hero1WordBaseList = new List<string>();
         hero2WordBaseList = new List<string>();
@@ -715,10 +691,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    /**
-     * Calculadora - Yandel
-     */
-    private List<string> Calculadora()
+    private List<string> CalculHero1Results()
     {
         List<string> validWords = new List<string>();
         for (int i = 0; i < 4; i++)
@@ -731,10 +704,7 @@ public class GameManager : MonoBehaviour
         return validWords;
     }
 
-    /**
-     * Calculator - 88 rising
-     */
-    private List<string> Calculator()
+    private List<string> CalculHero2Results()
     {
         List<string> validWords = new List<string>();
         for (int i = 0; i < 4; i++)
@@ -747,10 +717,7 @@ public class GameManager : MonoBehaviour
         return validWords;
     }
 
-    /**
-     * CalculatorWatch - CutHead
-     */
-    private List<string> CalculatorWatch()
+    private List<string> CalculHero3Results()
     {
         List<string> validWords = new List<string>();
         for (int i = 0; i < 2; i++)
@@ -763,11 +730,8 @@ public class GameManager : MonoBehaviour
         return validWords;
     }
 
-    /**
-     * ShowResults
-     * Show must go on - Queen
-    */
-    private void ShowMustGoOn()
+    //Show must go on
+    private void ShowResults()
     {
         hero1ResultSentence = "";
         hero2ResultSentence = "";
@@ -778,22 +742,22 @@ public class GameManager : MonoBehaviour
         bool hero3Found = false;
 
         //HERO 1
-        if (Calculadora().Count == 4)
+        if (CalculHero1Results().Count == 4)
         {
             string firstSentence = "C'est un perfect pour moi scribe ! En même temps, c'est ton métier...";
             hero1ResultSentence += firstSentence;
             hero1Found = true; 
         }
-        else if (Calculadora().Count > 0)
+        else if (CalculHero1Results().Count > 0)
         {
             string firstSentence = "Bien joué scribe ! Tu ne t'es pas gourré pour : \n";
             hero1ResultSentence += firstSentence;
-            foreach(string _word in Calculadora())
+            foreach(string _word in CalculHero1Results())
             {
                 hero1ResultSentence += "\n         " + _word;
             }
             hero1Found = false;
-        } else if(Calculadora().Count == 0)
+        } else if(CalculHero1Results().Count == 0)
         {
             string firstSentence = "J'ai la vague impression que t'as pas écouté ce que je t'ai raconté...";
             hero1ResultSentence += firstSentence;
@@ -801,23 +765,23 @@ public class GameManager : MonoBehaviour
         }
 
         //HER0 2
-        if (Calculator().Count == 4)
+        if (CalculHero2Results().Count == 4)
         {
             string firstSentence = "Voilà ! C'est ce qu'il s'est passé MOT - POUR - MOT pour ma part !";
             hero2ResultSentence += firstSentence;
             hero2Found = true;
         }
-        else if (Calculator().Count > 0)
+        else if (CalculHero2Results().Count > 0)
         {
             string firstSentence = "Perso, on est d'accord pour : \n";
             hero2ResultSentence += firstSentence;
-            foreach (string _word in Calculator())
+            foreach (string _word in CalculHero2Results())
             {
                 hero2ResultSentence += "\n         " + _word;
             }
             hero2Found = false;
         }
-        else if (Calculator().Count == 0)
+        else if (CalculHero2Results().Count == 0)
         {
             string firstSentence = "Mouai, tu ferais mieux de t'appliquer...";
             hero2ResultSentence += firstSentence;
@@ -825,23 +789,23 @@ public class GameManager : MonoBehaviour
         }
 
         //HERO 3
-        if (CalculatorWatch().Count == 2)
+        if (CalculHero3Results().Count == 2)
         {
             string firstSentence = "Chapeau le scribe ! C'est ce que moi ce que j'avais dit complètement !";
             hero3ResultSentence += firstSentence;
             hero3Found = true;
         }
-        else if (CalculatorWatch().Count > 0)
+        else if (CalculHero3Results().Count > 0)
         {
             string firstSentence = "Nickel ! C'est exactement ce qu'il s'est passé pour : \n";
             hero3ResultSentence += firstSentence;
-            foreach (string _word in CalculatorWatch())
+            foreach (string _word in CalculHero3Results())
             {
                 hero3ResultSentence += "\n         " + _word;
             }
             hero3Found = false;
         }
-        else if (CalculatorWatch().Count == 0)
+        else if (CalculHero3Results().Count == 0)
         {
             string firstSentence = "Ta capacité de retranscrire ce que j'ai dit = NEANT...";
             hero3ResultSentence += firstSentence;
@@ -851,7 +815,7 @@ public class GameManager : MonoBehaviour
         if(hero1Found && hero2Found && hero3Found)
         {
             //WIN
-            StartCoroutine(PonDeReplay());
+            StartCoroutine(DisplayReplayScreen());
         }
 
         hero1ResultText.text = hero1ResultSentence;
@@ -859,10 +823,7 @@ public class GameManager : MonoBehaviour
         hero3ResultText.text = hero3ResultSentence;
     }
 
-    /**
-     * Pon de Replay - Rihanna
-     */
-    IEnumerator PonDeReplay()
+    IEnumerator DisplayReplayScreen()
     {
         yield return new WaitForSeconds(.1f);
         nextButton.SetActive(false);
@@ -872,10 +833,7 @@ public class GameManager : MonoBehaviour
         scoreText.text = tryNumber.ToString();
     }
 
-    /**
-     * Reload It - AdeJosh
-     */
-    public void ReloadIt()
+    public void ReloadScene()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
